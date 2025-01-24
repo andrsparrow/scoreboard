@@ -5,6 +5,9 @@ import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll
 
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
 class ScoreboardServiceImplTest extends Specification {
     @Subject
     def scoreboardService = new ScoreboardServiceImpl()
@@ -81,7 +84,7 @@ class ScoreboardServiceImplTest extends Specification {
 
     def "update score with invalid teams -> ignore update match score"() {
         when:
-        def result =scoreboardService.updateScore(null, "Manchester United", 0, 0)
+        def result = scoreboardService.updateScore(null, "Manchester United", 0, 0)
 
         then:
         !result
@@ -97,7 +100,7 @@ class ScoreboardServiceImplTest extends Specification {
         def invalidHomeTeam = "Invalid Home Team"
 
         when:
-        def result =scoreboardService.updateScore(invalidHomeTeam, awayTeam, 10, 5)
+        def result = scoreboardService.updateScore(invalidHomeTeam, awayTeam, 10, 5)
 
         then:
         !result
@@ -114,7 +117,7 @@ class ScoreboardServiceImplTest extends Specification {
         scoreboardService.startMatch(homeTeam, awayTeam)
 
         when:
-        def result =scoreboardService.updateScore(homeTeam, awayTeam, -1, 0)
+        def result = scoreboardService.updateScore(homeTeam, awayTeam, -1, 0)
 
         then:
         !result
@@ -175,5 +178,31 @@ class ScoreboardServiceImplTest extends Specification {
 
         orderedMatches[4].homeTeamName == "Germany"
         orderedMatches[4].awayTeamName == "France"
+    }
+
+    def "test multithreaded access"() {
+        given:
+        def executor = Executors.newFixedThreadPool(10)
+
+        when:
+        (1..20).each {
+            executor.submit(() -> {
+                def random = new Random()
+                String homeTeam = "Team " + random.nextInt(100)
+                String awayTeam = "Team " + (random.nextInt(100) + 1)
+                scoreboardService.startMatch(homeTeam, awayTeam)
+
+                def homeScore = random.nextInt(6)
+                def awayScore = random.nextInt(6)
+
+                scoreboardService.updateScore(homeTeam, awayTeam, homeScore, awayScore)
+            })
+        }
+        executor.shutdown()
+        executor.awaitTermination(5, TimeUnit.SECONDS)
+
+        then:
+        noExceptionThrown()
+        scoreboardService.printSummary()
     }
 }

@@ -12,11 +12,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <lombok.version>1.18.30</lombok.version>
-    <slf4j.version>2.0.6</slf4j.version>
     <spock-core.version>2.4-M1-groovy-4.0</spock-core.version>
     <groovy-all.version>4.0.24</groovy-all.version>
     <gmavenplus-plugin.version>3.0.2</gmavenplus-plugin.version>
-
+    <log4j-core.version>2.6.1</log4j-core.version>
   </properties>
 
   <dependencies>
@@ -29,17 +28,17 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.6.1</version>
+      <version>${log4j-core.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.6.1</version>
+      <version>${log4j-core.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.6.1</version>
+      <version>${log4j-core.version}</version>
     </dependency>
 
     <dependency>
@@ -72,12 +71,6 @@
           <artifactId>junit</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <!-- enables mocking of classes (in addition to interfaces) -->
-      <groupId>cglib</groupId>
-      <artifactId>cglib-nodep</artifactId>
-      <version>3.2.4</version>
     </dependency>
 
   </dependencies>
